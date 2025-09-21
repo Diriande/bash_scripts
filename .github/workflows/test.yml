@@ -63,6 +63,52 @@ jobs:
         # Test de l'option d'aide
         ./env_validator.sh --help
 
+  test-centos7:
+    runs-on: ubuntu-latest
+    name: Test on CentOS 7
+    container:
+      image: quay.io/centos/centos:7
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        yum update -y
+        yum install -y epel-release
+        yum install -y jq bash
+
+    - name: Make script executable
+      run: chmod +x env_validator.sh
+
+    - name: Test script functionality
+      run: |
+        # Test complet du script sur CentOS 7
+        ./env_validator.sh config.json
+
+    - name: Test with environment variables
+      run: |
+        # Test avec des variables d'environnement prédéfinies
+        export DEBUG_MODE="false"
+        export PORT="3000"
+        export API_KEY="old_key"
+        ./env_validator.sh config.json
+
+    - name: Test help option
+      run: |
+        # Test de l'option d'aide
+        ./env_validator.sh --help
+
+    - name: Test error handling
+      run: |
+        # Test avec fichier manquant (doit échouer)
+        if ./env_validator.sh missing.json; then
+          echo "ERREUR: Le script devrait échouer avec un fichier manquant"
+          exit 1
+        else
+          echo "SUCCÈS: Le script échoue correctement avec un fichier manquant"
+        fi
+
   test-scenarios:
     runs-on: ubuntu-latest
     name: Test Various Scenarios
