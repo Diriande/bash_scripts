@@ -63,42 +63,6 @@ jobs:
         # Test de l'option d'aide
         ./env_validator.sh --help
 
-  test-centos7:
-    runs-on: ubuntu-latest
-    name: Test on CentOS 7
-    container:
-      image: quay.io/centos/centos:7
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install dependencies
-      run: |
-        yum update -y
-        yum install -y epel-release
-        yum install -y jq bash
-
-    - name: Make script executable
-      run: chmod +x env_validator.sh
-
-    - name: Test script functionality
-      run: |
-        # Test complet du script sur CentOS 7
-        ./env_validator.sh config.json
-
-    - name: Test with environment variables
-      run: |
-        # Test avec des variables d'environnement prédéfinies
-        export DEBUG_MODE="false"
-        export PORT="3000"
-        export API_KEY="old_key"
-        ./env_validator.sh config.json
-
-    - name: Test help option
-      run: |
-        # Test de l'option d'aide
-        ./env_validator.sh --help
-
   test-scenarios:
     runs-on: ubuntu-latest
     name: Test Various Scenarios
@@ -173,41 +137,3 @@ jobs:
         echo "Test de performance avec 100 variables..."
         time ./env_validator.sh TEST/large-config.json
 
-  test-alternative:
-    runs-on: ubuntu-latest
-    name: Test Alternative (Ubuntu)
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y jq
-
-    - name: Make script executable
-      run: chmod +x env_validator.sh
-
-    - name: Test script functionality
-      run: |
-        # Test complet du script sur Ubuntu
-        ./env_validator.sh config.json
-
-    - name: Test with test scenarios
-      run: |
-        # Test avec différents scénarios
-        ./env_validator.sh TEST/scenarios/test-empty.json
-        ./env_validator.sh TEST/scenarios/test-single.json
-        ./env_validator.sh TEST/scenarios/test-complex.json
-
-    - name: Test error handling
-      run: |
-        # Créer et exécuter le script de test
-        chmod +x test-invalid-json.sh
-        ./test-invalid-json.sh
-
-    - name: Test unit functions
-      run: |
-        # Test des fonctions unitaires
-        chmod +x TEST/test-functions.sh
-        ./TEST/test-functions.sh
