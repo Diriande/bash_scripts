@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test on CentOS 7
     container:
-      image: centos:7
+      image: quay.io/centos/centos:7
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test on CentOS 8 / Rocky Linux
     container:
-      image: rockylinux:8
+      image: quay.io/rockylinux/rockylinux:8
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -90,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test Various Scenarios
     container:
-      image: rockylinux:8
+      image: quay.io/rockylinux/rockylinux:8
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -132,7 +132,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test Error Handling
     container:
-      image: rockylinux:8
+      image: quay.io/rockylinux/rockylinux:8
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -164,7 +164,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test Performance
     container:
-      image: rockylinux:8
+      image: quay.io/rockylinux/rockylinux:8
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -191,3 +191,46 @@ jobs:
       run: |
         echo "Test de performance avec 100 variables..."
         time ./env_validator.sh TEST/large-config.json
+
+  test-alternative:
+    runs-on: ubuntu-latest
+    name: Test Alternative (Ubuntu)
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq
+
+    - name: Make script executable
+      run: chmod +x env_validator.sh
+
+    - name: Test script functionality
+      run: |
+        # Test complet du script sur Ubuntu
+        ./env_validator.sh config.json
+
+    - name: Test with test scenarios
+      run: |
+        # Test avec différents scénarios
+        ./env_validator.sh TEST/scenarios/test-empty.json
+        ./env_validator.sh TEST/scenarios/test-single.json
+        ./env_validator.sh TEST/scenarios/test-complex.json
+
+    - name: Test error handling
+      run: |
+        # Test avec JSON invalide (doit échouer)
+        if ./env_validator.sh TEST/scenarios/test-invalid.json; then
+          echo "ERREUR: Le script devrait échouer avec un JSON invalide"
+          exit 1
+        else
+          echo "SUCCÈS: Le script échoue correctement avec un JSON invalide"
+        fi
+
+    - name: Test unit functions
+      run: |
+        # Test des fonctions unitaires
+        chmod +x TEST/test-functions.sh
+        ./TEST/test-functions.sh
