@@ -1,0 +1,193 @@
+name: Test Environment Validator Script
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-centos7:
+    runs-on: ubuntu-latest
+    name: Test on CentOS 7
+    container:
+      image: centos:7
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        yum update -y
+        yum install -y epel-release
+        yum install -y jq bash
+
+    - name: Make script executable
+      run: chmod +x env_validator.sh
+
+    - name: Test script with valid JSON
+      run: |
+        # Test 1: Script avec fichier JSON valide
+        ./env_validator.sh config.json
+
+    - name: Test script with missing JSON file
+      run: |
+        # Test 2: Script avec fichier JSON manquant (doit échouer)
+        if ./env_validator.sh missing.json; then
+          echo "ERREUR: Le script devrait échouer avec un fichier manquant"
+          exit 1
+        else
+          echo "SUCCÈS: Le script échoue correctement avec un fichier manquant"
+        fi
+
+    - name: Test script with invalid JSON
+      run: |
+        # Test 3: Script avec JSON invalide
+        if ./env_validator.sh TEST/scenarios/test-invalid.json; then
+          echo "ERREUR: Le script devrait échouer avec un JSON invalide"
+          exit 1
+        else
+          echo "SUCCÈS: Le script échoue correctement avec un JSON invalide"
+        fi
+
+    - name: Test help option
+      run: |
+        # Test 4: Option d'aide
+        ./env_validator.sh --help
+
+  test-centos8:
+    runs-on: ubuntu-latest
+    name: Test on CentOS 8 / Rocky Linux
+    container:
+      image: rockylinux:8
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        dnf update -y
+        dnf install -y jq bash
+
+    - name: Make script executable
+      run: chmod +x env_validator.sh
+
+    - name: Test script functionality
+      run: |
+        # Test complet du script
+        ./env_validator.sh config.json
+
+    - name: Test with environment variables
+      run: |
+        # Test avec des variables d'environnement prédéfinies
+        export DEBUG_MODE="false"
+        export PORT="3000"
+        export API_KEY="old_key"
+        ./env_validator.sh config.json
+
+  test-scenarios:
+    runs-on: ubuntu-latest
+    name: Test Various Scenarios
+    container:
+      image: rockylinux:8
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        dnf update -y
+        dnf install -y jq bash
+
+    - name: Make script executable
+      run: chmod +x env_validator.sh
+
+    - name: Test empty JSON
+      run: |
+        echo "Test avec JSON vide..."
+        ./env_validator.sh TEST/scenarios/test-empty.json
+
+    - name: Test single variable
+      run: |
+        echo "Test avec une seule variable..."
+        ./env_validator.sh TEST/scenarios/test-single.json
+
+    - name: Test complex scenario
+      run: |
+        echo "Test avec scénario complexe..."
+        # Définir quelques variables d'environnement pour tester les discordances
+        export DEBUG_MODE="false"
+        export PORT="8080"
+        export API_KEY="different_key"
+        ./env_validator.sh TEST/scenarios/test-complex.json
+
+    - name: Test script sourcing (should not execute)
+      run: |
+        echo "Test que le script ne s'exécute pas quand sourcé..."
+        source env_validator.sh
+        echo "Script sourcé avec succès (ne devrait pas s'exécuter)"
+
+  test-error-handling:
+    runs-on: ubuntu-latest
+    name: Test Error Handling
+    container:
+      image: rockylinux:8
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        dnf update -y
+        dnf install -y bash
+        # Ne pas installer jq pour tester l'erreur
+
+    - name: Make script executable
+      run: chmod +x env_validator.sh
+
+    - name: Test without jq (should fail)
+      run: |
+        if ./env_validator.sh config.json; then
+          echo "ERREUR: Le script devrait échouer sans jq"
+          exit 1
+        else
+          echo "SUCCÈS: Le script échoue correctement sans jq"
+        fi
+
+    - name: Install jq and test again
+      run: |
+        dnf install -y jq
+        ./env_validator.sh config.json
+
+  test-performance:
+    runs-on: ubuntu-latest
+    name: Test Performance
+    container:
+      image: rockylinux:8
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        dnf update -y
+        dnf install -y jq bash time
+
+    - name: Make script executable
+      run: chmod +x env_validator.sh
+
+    - name: Create large JSON file
+      run: |
+        # Créer un JSON avec beaucoup de variables
+        echo '{' > TEST/large-config.json
+        for i in {1..100}; do
+          echo "  \"VAR_$i\": \"value_$i\"," >> TEST/large-config.json
+        done
+        echo '  "LAST_VAR": "last_value"' >> TEST/large-config.json
+        echo '}' >> TEST/large-config.json
+
+    - name: Test performance with large JSON
+      run: |
+        echo "Test de performance avec 100 variables..."
+        time ./env_validator.sh TEST/large-config.json

@@ -1,0 +1,12 @@
+{
+  "DATABASE_URL": "postgresql://test:test@localhost:5432/testdb",
+  "API_KEY": "test123",
+  "DEBUG_MODE": "true",
+  "PORT": "9000",
+  "LOG_LEVEL": "debug",
+  "CACHE_TTL": "7200",
+  "NEW_VAR": "new_value",
+  "SPECIAL_CHARS": "value with spaces and @#$%",
+  "NUMERIC_VALUE": "12345",
+  "BOOLEAN_VALUE": "false"
+}

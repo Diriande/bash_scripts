@@ -177,3 +177,79 @@ chmod +x env_validator.sh
 ```
 
 Le script est optimisé pour CentOS/RHEL et fonctionne parfaitement sous WSL avec une distribution CentOS/RHEL.
+
+## Tests
+
+### Tests automatisés avec GitHub Actions
+
+Le projet inclut un workflow GitHub Actions complet qui teste le script sur différentes versions de CentOS/RHEL :
+
+- **CentOS 7** : Tests de base et gestion d'erreurs
+- **CentOS 8 / Rocky Linux** : Tests avancés et scénarios complexes
+- **Tests de performance** : Avec des fichiers JSON volumineux
+- **Tests d'erreur** : Gestion des cas d'échec
+
+### Tests locaux
+
+#### Test unitaire des fonctions
+```bash
+# Rendre le script de test exécutable
+chmod +x TEST/test-functions.sh
+
+# Exécuter tous les tests unitaires
+./TEST/test-functions.sh
+```
+
+#### Tests manuels avec différents scénarios
+```bash
+# Test avec JSON vide
+./env_validator.sh TEST/scenarios/test-empty.json
+
+# Test avec une seule variable
+./env_validator.sh TEST/scenarios/test-single.json
+
+# Test avec scénario complexe
+./env_validator.sh TEST/scenarios/test-complex.json
+
+# Test avec JSON invalide (doit échouer)
+./env_validator.sh TEST/scenarios/test-invalid.json
+```
+
+### Scénarios de test inclus
+
+1. **Fichier JSON valide** - Test de base avec `config.json`
+2. **Fichier JSON manquant** - Vérification de la gestion d'erreur
+3. **JSON invalide** - Test de robustesse
+4. **JSON vide** - Test avec objet vide
+5. **Variables discordantes** - Test de détection des différences
+6. **Variables manquantes** - Test de variables non définies
+7. **Surcharge de variables** - Test de remplacement
+8. **Performance** - Test avec 100+ variables
+9. **Gestion d'erreurs** - Test sans `jq` installé
+10. **Sourcing** - Vérification que le script ne s'exécute pas quand sourcé
+
+### Exécution des tests
+
+```bash
+# Tests complets (nécessite jq)
+./TEST/test-functions.sh
+
+# Test spécifique
+./env_validator.sh TEST/scenarios/test-complex.json
+
+# Test d'aide
+./env_validator.sh --help
+```
+
+### Structure des tests
+
+```
+TEST/
+├── test-functions.sh          # Tests unitaires des fonctions
+├── test-config.json           # Configuration de test
+└── scenarios/
+    ├── test-empty.json        # JSON vide
+    ├── test-single.json       # Une seule variable
+    ├── test-complex.json      # Scénario complexe
+    └── test-invalid.json      # JSON invalide
+```
