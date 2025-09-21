@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test on RHEL 9
     container:
-      image: quay.io/redhat/ubi9:latest
+      image: quay.io/rockylinux/rockylinux:9
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test Various Scenarios
     container:
-      image: quay.io/redhat/ubi9:latest
+      image: quay.io/rockylinux/rockylinux:9
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -145,7 +145,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test Performance
     container:
-      image: quay.io/redhat/ubi9:latest
+      image: quay.io/rockylinux/rockylinux:9
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
