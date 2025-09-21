@@ -24,11 +24,6 @@ Ce script bash permet de valider et synchroniser les variables d'environnement a
 sudo dnf install jq
 ```
 
-**CentOS/RHEL 8 / Rocky Linux 8 / AlmaLinux 8:**
-```bash
-sudo dnf install jq
-```
-
 **CentOS/RHEL 7:**
 ```bash
 sudo yum install epel-release
@@ -176,17 +171,17 @@ chmod +x env_validator.sh
 ./env_validator.sh
 ```
 
-Le script est optimisé pour RHEL 9 (cible principale) et fonctionne parfaitement sous WSL avec une distribution RHEL/CentOS.
+Le script est optimisé pour RHEL 9 (cible principale) et CentOS 7, et fonctionne parfaitement sous WSL avec une distribution RHEL/CentOS.
 
 ## Tests
 
 ### Tests automatisés avec GitHub Actions
 
-Le projet inclut un workflow GitHub Actions complet qui teste le script sur différentes versions de CentOS/RHEL :
+Le projet inclut un workflow GitHub Actions complet qui teste le script sur les versions cibles :
 
 - **RHEL 9 (cible principale)** : Tests complets et scénarios avancés
+- **CentOS 7** : Tests de compatibilité avec les anciennes versions
 - **Tests de performance** : Avec des fichiers JSON volumineux
-- **Tests d'erreur** : Gestion des cas d'échec
 - **Tests alternatifs** : Sur Ubuntu pour compatibilité maximale
 
 ### Tests locaux
