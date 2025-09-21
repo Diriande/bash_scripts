@@ -14,25 +14,25 @@ Ce script bash permet de valider et synchroniser les variables d'environnement a
 
 ## Prérequis
 
-- Bash (CentOS/RHEL/WSL)
+- Bash (RHEL 9 / CentOS/RHEL/WSL)
 - `jq` pour le parsing JSON
 
 ### Installation de jq
+
+**RHEL 9 (cible principale):**
+```bash
+sudo dnf install jq
+```
+
+**CentOS/RHEL 8 / Rocky Linux 8 / AlmaLinux 8:**
+```bash
+sudo dnf install jq
+```
 
 **CentOS/RHEL 7:**
 ```bash
 sudo yum install epel-release
 sudo yum install jq
-```
-
-**CentOS/RHEL 8+ / Rocky Linux / AlmaLinux:**
-```bash
-sudo dnf install jq
-```
-
-**RHEL 8+ (avec subscription):**
-```bash
-sudo dnf install jq
 ```
 
 ## Utilisation
@@ -176,7 +176,7 @@ chmod +x env_validator.sh
 ./env_validator.sh
 ```
 
-Le script est optimisé pour CentOS/RHEL et fonctionne parfaitement sous WSL avec une distribution CentOS/RHEL.
+Le script est optimisé pour RHEL 9 (cible principale) et fonctionne parfaitement sous WSL avec une distribution RHEL/CentOS.
 
 ## Tests
 
@@ -184,10 +184,10 @@ Le script est optimisé pour CentOS/RHEL et fonctionne parfaitement sous WSL ave
 
 Le projet inclut un workflow GitHub Actions complet qui teste le script sur différentes versions de CentOS/RHEL :
 
-- **CentOS 7** : Tests de base et gestion d'erreurs
-- **CentOS 8 / Rocky Linux** : Tests avancés et scénarios complexes
+- **RHEL 9 (cible principale)** : Tests complets et scénarios avancés
 - **Tests de performance** : Avec des fichiers JSON volumineux
 - **Tests d'erreur** : Gestion des cas d'échec
+- **Tests alternatifs** : Sur Ubuntu pour compatibilité maximale
 
 ### Tests locaux
 

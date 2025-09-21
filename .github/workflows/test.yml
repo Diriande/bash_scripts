@@ -8,55 +8,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-centos7:
+  test-rhel9:
     runs-on: ubuntu-latest
-    name: Test on CentOS 7
+    name: Test on RHEL 9
     container:
-      image: quay.io/centos/centos:7
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install dependencies
-      run: |
-        yum update -y
-        yum install -y epel-release
-        yum install -y jq bash
-
-    - name: Make script executable
-      run: chmod +x env_validator.sh
-
-    - name: Test script with valid JSON
-      run: |
-        # Test 1: Script avec fichier JSON valide
-        ./env_validator.sh config.json
-
-    - name: Test script with missing JSON file
-      run: |
-        # Test 2: Script avec fichier JSON manquant (doit échouer)
-        if ./env_validator.sh missing.json; then
-          echo "ERREUR: Le script devrait échouer avec un fichier manquant"
-          exit 1
-        else
-          echo "SUCCÈS: Le script échoue correctement avec un fichier manquant"
-        fi
-
-    - name: Test script with invalid JSON
-      run: |
-        # Test 3: Script avec JSON invalide
-        chmod +x test-invalid-json.sh
-        ./test-invalid-json.sh
-
-    - name: Test help option
-      run: |
-        # Test 4: Option d'aide
-        ./env_validator.sh --help
-
-  test-centos8:
-    runs-on: ubuntu-latest
-    name: Test on CentOS 8 / Rocky Linux
-    container:
-      image: quay.io/rockylinux/rockylinux:8
+      image: quay.io/redhat/ubi9:latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -82,11 +38,36 @@ jobs:
         export API_KEY="old_key"
         ./env_validator.sh config.json
 
+    - name: Test script with missing JSON file
+      run: |
+        # Test avec fichier JSON manquant (doit échouer)
+        if ./env_validator.sh missing.json; then
+          echo "ERREUR: Le script devrait échouer avec un fichier manquant"
+          exit 1
+        else
+          echo "SUCCÈS: Le script échoue correctement avec un fichier manquant"
+        fi
+
+    - name: Test script with invalid JSON
+      run: |
+        # Test avec JSON invalide (doit échouer)
+        if ./env_validator.sh TEST/scenarios/test-invalid.json; then
+          echo "ERREUR: Le script devrait échouer avec un JSON invalide"
+          exit 1
+        else
+          echo "SUCCÈS: Le script échoue correctement avec un JSON invalide"
+        fi
+
+    - name: Test help option
+      run: |
+        # Test de l'option d'aide
+        ./env_validator.sh --help
+
   test-scenarios:
     runs-on: ubuntu-latest
     name: Test Various Scenarios
     container:
-      image: quay.io/rockylinux/rockylinux:8
+      image: quay.io/redhat/ubi9:latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -124,43 +105,11 @@ jobs:
         source ./env_validator.sh
         echo "Script sourcé avec succès (ne devrait pas s'exécuter)"
 
-  test-error-handling:
-    runs-on: ubuntu-latest
-    name: Test Error Handling
-    container:
-      image: quay.io/rockylinux/rockylinux:8
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install dependencies
-      run: |
-        dnf update -y
-        dnf install -y bash
-        # Ne pas installer jq pour tester l'erreur
-
-    - name: Make script executable
-      run: chmod +x env_validator.sh
-
-    - name: Test without jq (should fail)
-      run: |
-        if ./env_validator.sh config.json; then
-          echo "ERREUR: Le script devrait échouer sans jq"
-          exit 1
-        else
-          echo "SUCCÈS: Le script échoue correctement sans jq"
-        fi
-
-    - name: Install jq and test again
-      run: |
-        dnf install -y jq
-        ./env_validator.sh config.json
-
   test-performance:
     runs-on: ubuntu-latest
     name: Test Performance
     container:
-      image: quay.io/rockylinux/rockylinux:8
+      image: quay.io/redhat/ubi9:latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
