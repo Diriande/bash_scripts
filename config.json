@@ -1,0 +1,8 @@
+{
+  "DATABASE_URL": "postgresql://user:password@localhost:5432/mydb",
+  "API_KEY": "abc123def456",
+  "DEBUG_MODE": "true",
+  "PORT": "8080",
+  "LOG_LEVEL": "info",
+  "CACHE_TTL": "3600"
+}
