@@ -31,6 +31,12 @@ read_json_file() {
     
     echo -e "${GREEN}Lecture du fichier JSON: $json_file${NC}"
     
+    # Vérifier d'abord si le JSON est valide
+    if ! jq empty "$json_file" 2>/dev/null; then
+        echo -e "${RED}Erreur: Le fichier JSON '$json_file' contient des erreurs de syntaxe.${NC}"
+        return 1
+    fi
+    
     # Parser le JSON et extraire les paires clé-valeur
     while IFS='=' read -r key value; do
         if [[ -n "$key" && -n "$value" ]]; then
@@ -41,6 +47,12 @@ read_json_file() {
             echo "  Variable JSON trouvée: $key = $value"
         fi
     done < <(jq -r 'to_entries[] | "\(.key)=\(.value)"' "$json_file")
+    
+    # Vérifier si jq a échoué lors du parsing
+    if [[ $? -ne 0 ]]; then
+        echo -e "${RED}Erreur: Échec du parsing JSON avec jq.${NC}"
+        return 1
+    fi
     
     echo -e "${GREEN}Total de variables JSON trouvées: ${#json_vars[@]}${NC}"
     return 0

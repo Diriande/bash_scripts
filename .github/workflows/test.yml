@@ -44,12 +44,8 @@ jobs:
     - name: Test script with invalid JSON
       run: |
         # Test 3: Script avec JSON invalide
-        if ./env_validator.sh TEST/scenarios/test-invalid.json; then
-          echo "ERREUR: Le script devrait échouer avec un JSON invalide"
-          exit 1
-        else
-          echo "SUCCÈS: Le script échoue correctement avec un JSON invalide"
-        fi
+        chmod +x test-invalid-json.sh
+        ./test-invalid-json.sh
 
     - name: Test help option
       run: |
@@ -125,7 +121,7 @@ jobs:
     - name: Test script sourcing (should not execute)
       run: |
         echo "Test que le script ne s'exécute pas quand sourcé..."
-        source env_validator.sh
+        source ./env_validator.sh
         echo "Script sourcé avec succès (ne devrait pas s'exécuter)"
 
   test-error-handling:
@@ -221,13 +217,9 @@ jobs:
 
     - name: Test error handling
       run: |
-        # Test avec JSON invalide (doit échouer)
-        if ./env_validator.sh TEST/scenarios/test-invalid.json; then
-          echo "ERREUR: Le script devrait échouer avec un JSON invalide"
-          exit 1
-        else
-          echo "SUCCÈS: Le script échoue correctement avec un JSON invalide"
-        fi
+        # Créer et exécuter le script de test
+        chmod +x test-invalid-json.sh
+        ./test-invalid-json.sh
 
     - name: Test unit functions
       run: |
