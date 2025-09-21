@@ -14,25 +14,20 @@ Ce script bash permet de valider et synchroniser les variables d'environnement a
 
 ## Prérequis
 
-- Bash (CentOS/RHEL/WSL)
+- Bash (RHEL 9 / CentOS/RHEL/WSL)
 - `jq` pour le parsing JSON
 
 ### Installation de jq
+
+**RHEL 9 (cible principale):**
+```bash
+sudo dnf install jq
+```
 
 **CentOS/RHEL 7:**
 ```bash
 sudo yum install epel-release
 sudo yum install jq
-```
-
-**CentOS/RHEL 8+ / Rocky Linux / AlmaLinux:**
-```bash
-sudo dnf install jq
-```
-
-**RHEL 8+ (avec subscription):**
-```bash
-sudo dnf install jq
 ```
 
 ## Utilisation
@@ -176,4 +171,77 @@ chmod +x env_validator.sh
 ./env_validator.sh
 ```
 
-Le script est optimisé pour CentOS/RHEL et fonctionne parfaitement sous WSL avec une distribution CentOS/RHEL.
+Le script est optimisé pour RHEL 9 / Rocky Linux 9 (cible principale) et fonctionne parfaitement sous WSL avec une distribution RHEL/CentOS.
+
+## Tests
+
+### Tests automatisés avec GitHub Actions
+
+Le projet inclut un workflow GitHub Actions complet qui teste le script sur la version cible :
+
+- **RHEL 9 / Rocky Linux 9 (cible principale)** : Tests complets, scénarios avancés et performance
+
+### Tests locaux
+
+#### Test unitaire des fonctions
+```bash
+# Rendre le script de test exécutable
+chmod +x TEST/test-functions.sh
+
+# Exécuter tous les tests unitaires
+./TEST/test-functions.sh
+```
+
+#### Tests manuels avec différents scénarios
+```bash
+# Test avec JSON vide
+./env_validator.sh TEST/scenarios/test-empty.json
+
+# Test avec une seule variable
+./env_validator.sh TEST/scenarios/test-single.json
+
+# Test avec scénario complexe
+./env_validator.sh TEST/scenarios/test-complex.json
+
+# Test avec JSON invalide (doit échouer)
+./env_validator.sh TEST/scenarios/test-invalid.json
+```
+
+### Scénarios de test inclus
+
+1. **Fichier JSON valide** - Test de base avec `config.json`
+2. **Fichier JSON manquant** - Vérification de la gestion d'erreur
+3. **JSON invalide** - Test de robustesse
+4. **JSON vide** - Test avec objet vide
+5. **Variables discordantes** - Test de détection des différences
+6. **Variables manquantes** - Test de variables non définies
+7. **Surcharge de variables** - Test de remplacement
+8. **Performance** - Test avec 100+ variables
+9. **Gestion d'erreurs** - Test sans `jq` installé
+10. **Sourcing** - Vérification que le script ne s'exécute pas quand sourcé
+
+### Exécution des tests
+
+```bash
+# Tests complets (nécessite jq)
+./TEST/test-functions.sh
+
+# Test spécifique
+./env_validator.sh TEST/scenarios/test-complex.json
+
+# Test d'aide
+./env_validator.sh --help
+```
+
+### Structure des tests
+
+```
+TEST/
+├── test-functions.sh          # Tests unitaires des fonctions
+├── test-config.json           # Configuration de test
+└── scenarios/
+    ├── test-empty.json        # JSON vide
+    ├── test-single.json       # Une seule variable
+    ├── test-complex.json      # Scénario complexe
+    └── test-invalid.json      # JSON invalide
+```
